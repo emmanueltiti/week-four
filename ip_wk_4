@@ -1,0 +1,490 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "ip wk 4 '22",
+      "private_outputs": true,
+      "provenance": [],
+      "authorship_tag": "ABX9TyNq2uja0Yx/L8XZN/O1OecC",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/emmanueltiti/week-four/blob/main/ip_wk_4\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "id": "ALytceIq9uwx"
+      },
+      "outputs": [],
+      "source": [
+        "import numpy as np\n",
+        "import pandas  as pd\n",
+        "import seaborn as sns\n",
+        "import matplotlib.pyplot as plt\n",
+        "\n",
+        "#loading the data\n",
+        " \n",
+        "df=pd.read_csv(\"http://bit.ly/DSCoreAutolibDataset\") \n",
+        "df"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.describe()"
+      ],
+      "metadata": {
+        "id": "BzRCxIG9_KMA"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.shape"
+      ],
+      "metadata": {
+        "id": "gl2zHs4Wy76j"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.nunique()"
+      ],
+      "metadata": {
+        "id": "WAx9HUJry73h"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "#some of the columns data tyoes need to be changed, namely date, dayOfweek into a date type and an object respectively\n",
+        "df[\"date\"]=df['date'].astype('datetime64')\n",
+        "df[\"dayOfWeek\"]=df['dayOfWeek'].astype('object')\n",
+        "df[\"Postal code\"]=df['Postal code'].astype('object')\n",
+        "df[\"n_daily_data_points\"]=df['n_daily_data_points'].astype('object')\n",
+        "\n",
+        "\n",
+        "df.info()"
+      ],
+      "metadata": {
+        "id": "ICUwwyA4CNmN"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.isnull().sum()\n",
+        "#The data has no  missing values hense data is clean"
+      ],
+      "metadata": {
+        "id": "mn8D9aKr_XZx"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Outliers**"
+      ],
+      "metadata": {
+        "id": "K93hgtuC0-Ix"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#cheking for outliers\n",
+        "\n",
+        "fig, ((ax1, ax2, ax3)) = plt.subplots(1,3, figsize=(20,7))\n",
+        "fig.suptitle('Boxplots')\n",
+        "sns.boxplot(df['BlueCars_taken_sum'], ax=ax1)\n",
+        "sns.boxplot(df['Utilib_taken_sum'], ax=ax2)\n",
+        "sns.boxplot(df['Utilib_14_taken_sum'], ax=ax3)\n",
+        "plt.show()\n",
+        "#the results show the number of outliers in the three sellected columns \n"
+      ],
+      "metadata": {
+        "id": "ZZfR1oGsIoyC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# checking for anomalies\n",
+        "anomalies_columns = ['BlueCars_taken_sum', 'Utilib_taken_sum', 'Utilib_14_taken_sum']\n",
+        "fig, ax = plt.subplots(len(anomalies_columns), figsize=(12,18))\n",
+        "\n",
+        "for i, col_val in enumerate(anomalies_columns):\n",
+        "\n",
+        "    sns.boxplot(y=df[col_val], ax=ax[i])\n",
+        "    ax[i].set_xlabel(col_val, fontsize=1)"
+      ],
+      "metadata": {
+        "id": "u5TF_s3KzQN_"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**EXPLORATORY DATA ANALYSIS**\n",
+        "\n",
+        "UNIVARIATE ANALYSIS"
+      ],
+      "metadata": {
+        "id": "BWgRxxOx2sSK"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "for column in anomalies_columns:\n",
+        "  print('\\n')\n",
+        "  print(column + ', Mean: '+ str(df[column].mean()))\n",
+        "  print(column + ', Mode: '+ str(df[column].mode()))\n",
+        "  print(column + ', Median: '+ str(df[column].median()))\n",
+        "  print(column + ', Standard deviation: '+ str(df[column].std()))\n",
+        "  print(column + ', Variance: '+ str(df[column].var()))\n",
+        "  print(column + ', Skewness: '+ str(df[column].skew()))\n",
+        "  print(column + ', Kurtosis: '+ str(df[column].kurt()))\n"
+      ],
+      "metadata": {
+        "id": "oqLapCZT3iO0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Frequency Table"
+      ],
+      "metadata": {
+        "id": "6FZ62ek04Bom"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#frequency table for BlueCars_taken_sum variable\n",
+        "df.BlueCars_taken_sum.value_counts()\n"
+      ],
+      "metadata": {
+        "id": "aqqsneGM38w0"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Bivariate Analysis"
+      ],
+      "metadata": {
+        "id": "cRDmQIan-H2l"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df2=df.groupby('dayOfWeek')['BlueCars_taken_sum'].mean().sort_values(ascending=False)\n",
+        "df2.plot(x='dayOfWeek', kind='bar',title=' Bar Graph by day of week averages ', color='blue');\n",
+        "##from our results ,we see day five has the highest blue cars pick up on average \n"
+      ],
+      "metadata": {
+        "id": "FkTGV00j-HWZ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df1=df.groupby('day_type')['BlueCars_taken_sum'].mean().sort_values(ascending=False)\n",
+        "df1.plot(x='day_type', kind='bar',title=' Bar Graph of type of day averages ', color='magenta');\n",
+        "##on average weekends have more hires than the weekdays"
+      ],
+      "metadata": {
+        "id": "iV5iHYz0AYmH"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Bivariate analysis for numerical variables\n"
+      ],
+      "metadata": {
+        "id": "dzRxsUq_CLfM"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.corr()"
+      ],
+      "metadata": {
+        "id": "bISlcm10BNcP"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Plotting correlation using a heatmap\n",
+        "fig,ax = plt.subplots(figsize=(10, 10))\n",
+        "sns.heatmap(df.corr(),annot=True)\n",
+        "plt.show()"
+      ],
+      "metadata": {
+        "id": "mkriMOgrChzL"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**Hypothesis statement**\n",
+        "\n",
+        "\n",
+        "*$H_{o}$* = the average number of blue cars taken on weekdays is same as the on week ends.\n",
+        "\n",
+        "*$H_{i}$* =the averages of blue cars take on the weekends and week days are different\n",
+        "\n",
+        "We use the welch's test in this case "
+      ],
+      "metadata": {
+        "id": "RgcAgWCx260V"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#We can start by making two seperate data frames for  the weekdays and the weekends \n",
+        "df_weekday=df[[\"day_type\",\"BlueCars_taken_sum\"]]\n",
+        "df_weekday.drop(df_weekday.index[df_weekday[\"day_type\"] == 'weekend'], inplace = True)\n",
+        "sample_weekday=df_weekday.sample(frac=.75)\n",
+        "sample_weekday1=sample_weekday.drop(\"day_type\",axis=1)\n",
+        "sample_weekday1\n",
+        "#df2 now contains only weekday records from which we could get our samples ie 75% of the popularion for accuracy\n"
+      ],
+      "metadata": {
+        "id": "MUhzWAJ4qlcr"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##We do the same for the weekend data and obtain samples\n",
+        "df_weekend=df[[\"day_type\",\"BlueCars_taken_sum\"]]\n",
+        "df_weekend.drop(df_weekend.index[df_weekend[\"day_type\"] == 'weekday'], inplace = True)\n",
+        "df_weekend.head()\n",
+        "sample_weekend=df_weekend.sample(frac=.75)\n",
+        "sample_weekend1=sample_weekend.drop(\"day_type\",axis=1)\n",
+        "sample_weekend1"
+      ],
+      "metadata": {
+        "id": "2lesGAzDv8NO"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import scipy.stats as stats \n",
+        "import math"
+      ],
+      "metadata": {
+        "id": "PBlf_kut_Bsg"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##this si to show that our data has different variance hence  the two sample procedure cannot be used \n",
+        "stats.levene(df['BlueCars_taken_sum'][df['day_type'] == 'weekend'],\n",
+        "             df['BlueCars_taken_sum'][df['day_type'] == 'weekday'],\n",
+        "             center= 'mean')"
+      ],
+      "metadata": {
+        "id": "fAHexlvSX50n"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "\n",
+        "stats.shapiro(sample_weekend1\n",
+        "              ['BlueCars_taken_sum'])"
+      ],
+      "metadata": {
+        "id": "CrhKwn1dpmAC"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "stats.shapiro(sample_weekday1\n",
+        "              ['BlueCars_taken_sum'])"
+      ],
+      "metadata": {
+        "id": "MuMnLU3OrsHj"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##We can now perform our t sample t-test\n",
+        "stats.ttest_ind(a=sample_weekend1,b=sample_weekday1,equal_var=False)"
+      ],
+      "metadata": {
+        "id": "9PvwDPa3wwKq"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Point estimate"
+      ],
+      "metadata": {
+        "id": "WjLLlchZhFMu"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#the means /averages of our sample data is our point estimate for week day\n",
+        "print(sample_weekday['BlueCars_taken_sum'].mean() )\n",
+        "df_weekday['BlueCars_taken_sum'].mean()"
+      ],
+      "metadata": {
+        "id": "fNoJ_6vWwxHk"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#point estimate for weekends \n",
+        "print(sample_weekend['BlueCars_taken_sum'].mean() )\n",
+        "df_weekend['BlueCars_taken_sum'].mean()"
+      ],
+      "metadata": {
+        "id": "0pXZ6ffwhLTJ"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "Confidence intervals"
+      ],
+      "metadata": {
+        "id": "XNeMrVoThSOu"
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "##here we use the t value\n",
+        "t_critical=stats.t.ppf(q=0.975,df=2269)\n",
+        "print(t_critical)\n",
+        "sample_stdev = sample_weekend.std(ddof=1)\n",
+        "sigma = sample_stdev/math.sqrt(2270)  \n",
+        "margin_of_error = t_critical * sigma\n",
+        "\n",
+        "confidence_interval = ((sample_weekend['BlueCars_taken_sum'].mean() )- margin_of_error, (sample_weekend['BlueCars_taken_sum'].mean() ) + margin_of_error)  \n",
+        "print(\"Confidence interval:\")\n",
+        "print(confidence_interval)"
+      ],
+      "metadata": {
+        "id": "W1LH-8jIhQXM"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "#for the weekday sample\n",
+        "t_critical=stats.t.ppf(q=0.975,df=2269)\n",
+        "print(t_critical)\n",
+        "sample_stdev = sample_weekday.std(ddof=1)\n",
+        "sigma = sample_stdev/math.sqrt(2270)  \n",
+        "margin_of_error = t_critical * sigma\n",
+        "\n",
+        "confidence_interval = ((sample_weekday['BlueCars_taken_sum'].mean() )- margin_of_error,\n",
+        "                      (sample_weekday['BlueCars_taken_sum'].mean() ) + margin_of_error)  \n",
+        "print(\"Confidence interval:\")\n",
+        "print(confidence_interval)"
+      ],
+      "metadata": {
+        "id": "b8Qnuey5heDE"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "markdown",
+      "source": [
+        "**CONCLUSION**\n",
+        "\n",
+        "Our p value being too low ,lower than 0.05 we can then regect our null hypothesis thet the average blue cars taken on week days is same to those taken on weekends."
+      ],
+      "metadata": {
+        "id": "sRdqbgBjELSR"
+      }
+    }
+  ]
+}
